@@ -1,8 +1,11 @@
 const { Pool } = require('pg')
 
 let pool = new Pool({
-  // TODO change this after server is a container too
-  connectionString: 'postgres://postgres:root@localhost:5432/recipe-app'
+  // connectionString: 'postgres://postgres:root@localhost:5432/recipe-app'
+  user: 'postgres',
+  host: 'postgres',
+  password: 'root',
+  database: 'recipe-app'
 })
 
 async function init() {
@@ -87,8 +90,6 @@ async function addRecipe(recipe_name, directions, ingredients) {
   }
 }
 
-// edit recipe given a recipe id
-// a bit complicated here implement this one last
 async function editRecipe(recipe_id, recipe_name, directions, ingredients) {
   const client = await pool.connect()
 

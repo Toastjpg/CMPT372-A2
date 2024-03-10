@@ -12,7 +12,6 @@ app.get('/', (req, res) => {
   res.send('hello world')
 })
 
-// get all recipes
 app.get('/recipes/all', async (req, res) => {
   try {
     const recipes = await db.getRecipes()
@@ -20,11 +19,10 @@ app.get('/recipes/all', async (req, res) => {
   }
   catch (error) {
     console.error('Error on GET /recipes/all :', error.message)
-    res.status(404).json({ error: 'Recipes not found' })
+    res.status(404).json({ error: 'Recipes not found: the table doesnt exist lol' })
   }
 })
 
-// get all ingredients for a recipe
 app.get('/ingredients/:recipe_id', async (req, res) => {
   const recipe_id = req.params.recipe_id
 
@@ -34,11 +32,10 @@ app.get('/ingredients/:recipe_id', async (req, res) => {
   }
   catch (error) {
     console.error('Error on GET /ingredients/:recipe_id :', error.message)
-    res.status(404).json({ error: 'Ingredients for that recipe not found' })
+    res.status(404).json({ error: 'Invalid recipe_id' })
   }
 })
 
-// add new recipe
 app.post('/recipes', async (req, res) => {
   const { recipe_name, directions, ingredients } = req.body
 
@@ -52,7 +49,6 @@ app.post('/recipes', async (req, res) => {
   }
 })
 
-// edit recipe
 app.put('/recipes/:recipe_id', async (req, res) => {
   const recipe_id = req.params.recipe_id
   const { recipe_name, directions, ingredients } = req.body
@@ -68,14 +64,12 @@ app.put('/recipes/:recipe_id', async (req, res) => {
 
 })
 
-// delete a recipe
 app.delete('/recipes/:recipe_id', async (req, res) => {
   const recipe_id = req.params.recipe_id
 
   try {
     await db.deleteRecipe(recipe_id)
     res.status(200).json({ message: 'Recipe deleted successfully' })
-
   }
   catch (error) {
     console.error('Error on DELETE /recipes/:recipe_id : ', error.message)
@@ -90,7 +84,6 @@ async function initDb() {
 // This starts up the server
 // TODO: make sure that the docker container running postgres is always up before the server starts
 initDb().then(() => {
-  app.listen(port, () => {
-    console.log(`server is running on http://localhost:${port}`)
-  })
+  app.listen(port, '0.0.0.0')
+  console.log(`Server is running on http://0.0.0.0:${port}`)
 })
