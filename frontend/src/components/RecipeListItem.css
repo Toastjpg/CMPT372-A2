@@ -1,0 +1,12 @@
+.text-content {
+  white-space: pre-line
+}
+
+.card {
+  transition: all 0.3s
+}
+
+.card:hover {
+  transform: scale(1.04);
+  cursor: pointer;
+}
