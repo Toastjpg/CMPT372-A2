@@ -2,7 +2,7 @@ import RecipeListItem from "./RecipeListItem";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
-function RecipeList({ recipes, onDelete }) {
+function RecipeList({ recipes, onDelete, onEdit }) {
   function getContent() {
     if (recipes.length === 0) {
       return (
@@ -13,8 +13,8 @@ function RecipeList({ recipes, onDelete }) {
     return (
       <Row xs={3} className="g-3">
         {recipes.map((obj) => (
-          <Col key={obj.id}>
-            <RecipeListItem recipe={obj} onDelete={onDelete} />
+          <Col key={obj.recipe_id}>
+            <RecipeListItem recipe={obj} onDelete={onDelete} onEdit={onEdit} />
           </Col>
         ))}
       </Row>

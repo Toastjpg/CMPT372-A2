@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -8,48 +10,72 @@ import CreateForm from "./components/CreateForm";
 import { useEffect, useState } from "react";
 
 function App() {
-  // NOTE: This works? but triggers a rerender
-  // const [recipes, setRecipes] = useState([]);
-
-  // useEffect(() => {
-  //   // NOTE: Getting data from this use effect will cause app to rerender again
-  //   // Because of the setState being called -> will trigger rerender
-  //   // useEffect function runs after initial render
-  //   const items = localStorage.getItem("recipes");
-
-  //   if (items) {
-  //     const recipeList = JSON.parse(items);
-  //     setRecipes(recipeList);
-  //   }
-  // }, []);
-
-  // function addRecipe(newRecipe) {
-  //   const newList = [...recipes, newRecipe];
-  //   setRecipes(newList);
-  //   localStorage.setItem("recipes", JSON.stringify(newList));
-  // }
-
-  const [recipes, setRecipes] = useState(() => {
-    const items = localStorage.getItem("recipes");
-
-    if (items === null) return [];
-
-    return JSON.parse(items);
-  });
+  const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
-    localStorage.setItem("recipes", JSON.stringify(recipes));
-  }, [recipes]);
+    axios
+      .get("http://localhost:3000/recipes/all")
+      .then((res) => {
+        setRecipes(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   function addRecipe(newRecipe) {
-    const newList = [...recipes, newRecipe];
-    setRecipes(newList);
+    axios({
+      method: "post",
+      url: "http://localhost:3000/recipes",
+      data: newRecipe,
+    })
+      .then((res) => {
+        const newList = [...recipes, res.data];
+        setRecipes(newList);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   function deleteRecipe(id) {
-    setRecipes((currentRecipes) => {
-      return currentRecipes.filter((recipe) => recipe.id !== id);
-    });
+    axios({
+      method: "delete",
+      url: "http://localhost:3000/recipes/" + id,
+    })
+      .then((res) => {
+        setRecipes((currentRecipes) => {
+          return currentRecipes.filter((recipe) => recipe.recipe_id !== id);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  // TODO
+  function editRecipe(id, newRecipe) {
+    // calls put request and passes the data to end point
+    console.log("calling put request to edit");
+    // replace local object with the returned one
+
+    axios({
+      method: "put",
+      url: "http://localhost:3000/recipes/" + id,
+      data: newRecipe,
+    })
+      .then((res) => {
+        // replace the recipe obj with the returned one from res.data
+        const updated = res.data;
+        setRecipes((currentRecipes) => {
+          return currentRecipes.map((recipe) => {
+            return recipe.recipe_id === updated.recipe_id ? updated : recipe;
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   return (
@@ -66,7 +92,11 @@ function App() {
 
         <Row>
           <Col>
-            <RecipeList recipes={recipes} onDelete={deleteRecipe}></RecipeList>
+            <RecipeList
+              recipes={recipes}
+              onDelete={deleteRecipe}
+              onEdit={editRecipe}
+            ></RecipeList>
           </Col>
         </Row>
       </Container>
