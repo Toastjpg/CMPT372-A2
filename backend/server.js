@@ -2,15 +2,16 @@ const express = require('express')
 let app = express()
 
 const db = require('./src/controllers/db')
+const cors = require('cors')
+const path = require('path')
 
-const port = 8080
+const port = 3000
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cors())
 
-app.get('/', (req, res) => {
-  res.send('hello world')
-})
+app.use('/', express.static(path.join(__dirname, '/static')))
 
 app.get('/recipes/all', async (req, res) => {
   try {
@@ -41,7 +42,7 @@ app.post('/recipes', async (req, res) => {
 
   try {
     const result = await db.addRecipe(recipe_name, directions, ingredients)
-    res.status(201).json({ message: 'Recipe added successfully', recipe_id: result })
+    res.status(201).json(result)
   }
   catch (error) {
     console.error('Error on POST /recipes : ', error.message)
@@ -55,7 +56,7 @@ app.put('/recipes/:recipe_id', async (req, res) => {
 
   try {
     const result = await db.editRecipe(recipe_id, recipe_name, directions, ingredients)
-    res.status(200).json({ message: 'Recipe edited successfully', recipe_id: result })
+    res.status(200).json(result)
   }
   catch (error) {
     console.error('Error on PUT /recipes/:recipe_id : ', error.message)
@@ -82,8 +83,7 @@ async function initDb() {
 }
 
 // This starts up the server
-// TODO: make sure that the docker container running postgres is always up before the server starts
 initDb().then(() => {
   app.listen(port, '0.0.0.0')
-  console.log(`Server is running on http://0.0.0.0:${port}`)
+  console.log(`Server is running on http://localhost:${port}`)
 })

@@ -64,9 +64,10 @@ async function addRecipe(recipe_name, directions, ingredients) {
   try {
     await client.query('BEGIN')
 
-    const insertRecipeQuery = 'INSERT INTO recipes (recipe_name, directions) VALUES ($1, $2) RETURNING recipe_id'
+    const insertRecipeQuery = 'INSERT INTO recipes (recipe_name, directions) VALUES ($1, $2) RETURNING *'
     const recipeResult = await client.query(insertRecipeQuery, [recipe_name, directions])
-    const recipe_id = recipeResult.rows[0].recipe_id
+    const newRecipe = recipeResult.rows[0]
+    const recipe_id = newRecipe.recipe_id
 
     // TODO this inserts all the ingredients for each recipe -> regardless if they alr exist in table
     for (const ingredient_name of ingredients) {
@@ -79,7 +80,7 @@ async function addRecipe(recipe_name, directions, ingredients) {
     }
 
     await client.query('COMMIT')
-    return recipe_id
+    return newRecipe
   }
   catch (e) {
     await client.query('ROLLBACK')
@@ -124,7 +125,7 @@ async function editRecipe(recipe_id, recipe_name, directions, ingredients) {
     }
 
     await client.query('COMMIT')
-    return recipe_id
+    return updateResult.rows[0]
   }
   catch (e) {
     await client.query('ROLLBACK')

@@ -9,6 +9,6 @@ RUN npm install
 # Copy everything in the same folder as Dockerfile?
 COPY . .
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD [ "node", "server.js" ]
